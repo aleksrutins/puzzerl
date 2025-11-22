@@ -12,7 +12,7 @@ start(Days) ->
 
 run_day(Day, Days) ->
     io:format("== DAY ~s ==~n", [Day]),
-    {ok, Input} = file:open("in/" ++ Day, [read]),
+    {ok, Input} = file:read_file("in/" ++ Day),
     Out = apply(maps:get(Day, Days), [Input]),
     io:format("~s~n", [Out]),
     Out.
