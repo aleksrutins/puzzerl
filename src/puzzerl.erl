@@ -1,5 +1,5 @@
 -module(puzzerl).
--compile([{nowarn_unused_function, [{run_handler, 1}]}]).
+-compile([{nowarn_unused_function, [{run_handler, 1}, {run_day, 2}]}]).
 -include_lib("eunit/include/eunit.hrl").
 -export([main/2]).
 
@@ -10,10 +10,17 @@ main(Days, Args) ->
 start(Days) ->
     spawn(puzzerl, run_handler, Days).
 
+run_day(Day, Days) ->
+    io:format("== DAY ~s ==~n", [Day]),
+    {ok, Input} = file:open("in/" ++ Day, [read]),
+    Out = apply(maps:get(Day, Days), [Input]),
+    io:format("~s~n", [Out]),
+    Out.
+
 run_handler(Days) ->
     receive
         days -> maps:keys(Days);
-        {run,Day} -> apply(maps:get(Day, Days), []);
+        {run,Day} -> run_day(Day, Days);
         _ -> ok
     end.
 
