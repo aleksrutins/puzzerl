@@ -1,14 +1,9 @@
 -module(puzzerl).
--compile([{nowarn_unused_function, [{run_handler, 1}, {run_day, 2}]}]).
 -include_lib("eunit/include/eunit.hrl").
 -export([main/2]).
 
 main(Days, Args) ->
-    Pid = start(Days),
-    argparse:run(Args, cli(Pid), #{progname => nil}).
-
-start(Days) ->
-    spawn(puzzerl, run_handler, [Days]).
+    argparse:run(Args, cli(Days), #{progname => nil}).
 
 run_day(Day, Days) ->
     io:format("== DAY ~s ==~n", [Day]),
@@ -17,24 +12,16 @@ run_day(Day, Days) ->
     io:format("~s~n", [Out]),
     Out.
 
-run_handler(Days) ->
-    receive
-        days -> maps:keys(Days);
-        {run,Day} -> run_day(Day, Days);
-        _ -> ok
-    end.
-
-cli(Pid) ->
+cli(Days) ->
     #{
         arguments => [
             #{name => day}
         ],
-        handler => fun (#{day := Day}) -> run_cli(Pid, Day) end
+        handler => fun (#{day := Day}) -> run_cli(Days, Day) end
     }.
 
-run_cli(Pid, "all") ->
-    Days = Pid ! days,
-    lists:foreach(fun (Day) -> Pid ! {run, Day} end, Days);
+run_cli(Days, "all") ->
+    lists:foreach(fun (Day) -> run_day(Day, Days) end, maps:keys(Days));
 
-run_cli(Pid, Day) ->
-    Pid ! {run, Day}.
+run_cli(Days, Day) ->
+    run_day(Day, Days).
