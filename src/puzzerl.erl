@@ -8,7 +8,7 @@ main(Days, Args) ->
     argparse:run(Args, cli(Pid), #{progname => nil}).
 
 start(Days) ->
-    spawn(puzzerl, run_handler, Days).
+    spawn(puzzerl, run_handler, [Days]).
 
 run_day(Day, Days) ->
     io:format("== DAY ~s ==~n", [Day]),
